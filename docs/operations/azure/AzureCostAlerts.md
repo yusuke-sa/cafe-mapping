@@ -9,7 +9,7 @@
 1. <https://portal.azure.com/> にサインインし、左上のメニューから **「コスト管理 + 請求」** を開く。
 2. 左側ナビゲーションで **「コスト管理」→「予算」** を選択し、右上の **「追加」** をクリック。
 3. 以下の項目を入力し、**「次へ」** を選択する。
-   - **名前**: `budget-cafe-mapping`
+   - **名前**: `budget-iijan-map`
    - **範囲**: 対象サブスクリプション（1つのみ本番利用を想定）
    - **期間**: 月次 (Monthly)
    - **開始/終了日**: `2025-10-30` から無期限にする場合は終了日を未指定、または1年分 (例: 2026-12-31)
@@ -36,7 +36,7 @@ az consumption budget create \
   --scope /subscriptions/<subscription-id> \
   --amount 3000 \
   --time-grain Monthly \
-  --name budget-cafe-mapping \
+  --name budget-iijan-map \
   --start-date 2025-10-30 --end-date 2026-12-31 \
   --category cost \
   --notification threshold=0.5,operator=EqualTo,contactEmails=you@example.com \

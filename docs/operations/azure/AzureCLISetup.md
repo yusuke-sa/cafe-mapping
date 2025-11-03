@@ -43,7 +43,7 @@ az account set --subscription "<サブスクリプション名またはID>"
 - **既定のリージョン設定**: 頻繁に利用するリージョンを CLI のデフォルトに設定するとコマンドが簡潔になる。
 
   ```bash
-  az configure --defaults location=japaneast group=rg-cafe-mapping-dev
+  az configure --defaults location=japaneast group=rg-iijan-map-dev
   ```
 
 - **出力形式の指定**: `table` や `jsonc` に設定すると読みやすくなる。

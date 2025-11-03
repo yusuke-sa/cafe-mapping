@@ -1,0 +1,8 @@
+# 環境変数
+.env
+
+# Node modules
+node_modules/
+
+# macOS system files
+.DS_Store
