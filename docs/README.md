@@ -14,5 +14,6 @@
 - `operations/azure/AzureCostAlerts.md`: Azure Cost Managementの予算アラート構成手順。
 - `operations/gcp/GoogleCloudSetup.md`: Google Cloudプロジェクトと請求アカウントの設定。
 - `operations/gcp/GoogleMapsApiKey.md`: Google Maps APIキー発行とHTTPリファラ制限手順。
+- `operations/meta/InstagramSetup.md`: Instagramビジネス/Meta開発者アカウント準備手順。
 
 > 追加資料を作成する際は、内容に応じたフォルダに保存し、必要ならこのインデックスを更新してください。
