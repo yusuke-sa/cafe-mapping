@@ -1,4 +1,3 @@
-# TODO
-
-1. Replace placeholder連絡先 `contact@example.com` in both `docs/product/TermsOfService.md` and `docs/product/PrivacyPolicy.md` with実際に受信できる問い合わせメールアドレス（可能であれば運営者名/住所も追記）; 現状では利用者が責任主体を確認できない。
-2. 更新済みの正式文書に合わせて `docs/readiness/LegalGuidelines.md` の「正式文書を作成」「広告UIにラベル要件を盛り込む」といった未完了タスクを改訂済みステータスへ更新し、資料間の整合性を取る。
+1. docs/product/TermsOfService.md / docs/product/PrivacyPolicy.md がいまだ仮の連絡先 (contact@example.com) のまま。運営主体の実在する連絡窓口や所在地が記載されないと法的に不十分。
+2. docs/readiness/LegalGuidelines.md では「正式文書を作成」「広告UIにラベル要件を盛り込む」といったタスクが未完了として記載されているが、実際はdocs/product配下に対応文書が揃っている。現状と矛盾するため更新が必要。
+3. Instagram Graph API／Google Places API の審査・レート制御がまだ具体化されていない。少人数とはいえ審査落ちやクォータ超過があると運用停止になるので、早めに申請状況を確認すること。

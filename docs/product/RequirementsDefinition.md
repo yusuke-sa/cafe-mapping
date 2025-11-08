@@ -60,11 +60,11 @@
 - **更新頻度**: SNS投稿は日次～数時間単位で更新、AI要約は収集ごとに再生成、マップ表示用データはキャッシュ層で高速提供。
 
 ## 9. 技術スタック想定
-- **フロントエンド**: TypeScript + React or Next.js、Google Maps JavaScript APIを用いた地図描画、UIコンポーネントライブラリ（MUIなど）。
-- **バックエンド/API**: Node.js（Express/Fastify）またはAzure Functionsをベースとしたサーバーレス構成。
-- **データ処理**: Azure Data FactoryやAzure FunctionsでETLを実行し、AI推論はAzure Machine LearningもしくはAzure OpenAI ServiceとPython (PyTorch/Transformers) を組み合わせて実装。
-- **データベース**: 店舗メタデータはAzure Cosmos DBまたはAzure Database for PostgreSQL + PostGIS、テキスト・ベクトル検索はAzure Cognitive Searchを活用。
-- **インフラ**: Azure上でのリソース管理（App Service / Static Web Apps / Functions）、Azure Monitorによる監視、Azure DevOpsまたはGitHub ActionsでCI/CD構築。
+- **フロントエンド**: Next.js 15 (App Router) + React 19 + TypeScript。Google Maps JavaScript APIをラップし、MUIなどのUIライブラリでアクセシビリティを担保。Azure Static Web Appsへデプロイしてグローバルエッジ配信を行う。
+- **バックエンド/API**: Azure Functions (Node.js 22 + TypeScript) を採用。HTTPトリガーには Hono を統一的に組み込み、Fetch API ベースの軽量ルーティングと型安全なAPI実装を行う。タイマートリガーでSNS収集・AI要約バッチを実行。
+- **データ処理**: Azure FunctionsベースのETLと、必要に応じてAzure Data Factory。AI推論はAzure OpenAI（gpt-4o-mini等）をFunctionsから呼び出し、Python/TypeScript双方で拡張可能とする。
+- **データベース**: 店舗メタデータはAzure Cosmos DB (Serverless) を中心に、テキスト・ベクトル検索はAzure Cognitive Search (Hybrid) を活用。必要に応じてAzure Cache for Redisでレスポンスを高速化。
+- **インフラ/運用**: Azure Static Web Apps + Azure Functions + Cosmos DB + Cognitive Searchの統合構成。監視はAzure Monitor / Application Insights、CI/CDはGitHub Actionsで管理。
 
 ## 10. 外部連携・API
 - SNSデータ: Instagram Graph API、TikTok、Twitter(X)などの公開API。利用制限・承認手続きに合わせた実装が必要。
