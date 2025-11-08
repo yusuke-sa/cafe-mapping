@@ -11,7 +11,7 @@
 | Maps JavaScript API | 地図描画 | 500ロード | $3.50 | 無料クレジット$200/月内に収まる見込み。 |
 | Places Details API | 口コミ・詳細取得 | 200コール | $3.40 | 各店舗5件まで、24hキャッシュ。 |
 | Places Autocomplete API | 検索補助 | 200コール | $0.57 | 入力制限とキャッシュでコール数を抑制。 |
-*`docs/readiness/CostEstimation.md` 前提。
+*`docs/finance/CostEstimation.md` 前提。
 
 ### 2.2 クォータ・アラート設計
 - **予算アラート**: Google Cloud Console → Billing → Budgets で月額 ¥1,000 を設定。通知閾値 50% / 80% / 100% をメール（個人 + 共有）に送信。
@@ -20,7 +20,7 @@
   - Places Details: 160コール（80%）でSoft、200コールでHard。  
   - Autocomplete: 160/200で同上。
 - **通知チャネル**: メール + Slack（Incoming Webhook）で即時共有。
-- **屋内キャッシュ連携**: `docs/readiness/CacheStrategy.md` に基づくRedisキーでGeoJSON/Placesレスポンスをキャッシュし、80%超過時はTTLを延長して呼び出しを抑制。
+- **屋内キャッシュ連携**: `docs/architecture/CacheStrategy.md` に基づくRedisキーでGeoJSON/Placesレスポンスをキャッシュし、80%超過時はTTLを延長して呼び出しを抑制。
 
 ### 2.3 フェイルバック方針
 - 地図ロード失敗時: デフォルトエリア（東京23区）のスタティックマップと、最後に取得したGeoJSONを表示。
@@ -43,7 +43,7 @@
 - ポリシー違反が疑われる場合、アプリを開発モードへ戻すフローをドキュメント化。
 
 ## 4. キャッシュ・デグレード戦略
-- Google/InstagramレスポンスはCosmos DB + Redisにキャッシュし、同一データの再取得を最小化（`docs/readiness/CacheStrategy.md`）。
+- Google/InstagramレスポンスはCosmos DB + Redisにキャッシュし、同一データの再取得を最小化（`docs/architecture/CacheStrategy.md`）。
 - クォータ超過アラート発生時は以下優先度で対処:
   1. Redis/Front DoorのTTL調整、レスポンス削減（返却項目縮小）。
   2. ポーリング間隔を一時的に延長（Instagram週1回、Places詳細48hなど）。

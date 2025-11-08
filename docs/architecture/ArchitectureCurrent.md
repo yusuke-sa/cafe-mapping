@@ -17,7 +17,7 @@
 
 ## データ処理・AI
 - **ETL**: Azure Functions または Data Factory で Instagram Graph API / Google Places API 等から収集、整形、Cosmos DBへ格納。
-- **AI要約**: Azure OpenAI (gpt-4o-mini) を Functions から呼び出し、雰囲気タグやレビュー要約を生成（`docs/readiness/CostEstimation.md`）。
+- **AI要約**: Azure OpenAI (gpt-4o-mini) を Functions から呼び出し、雰囲気タグやレビュー要約を生成（`docs/finance/CostEstimation.md`）。
 
 ## データストア/検索
 - **Cosmos DB (Serverless)**: 店舗メタデータ、AIタグ、お気に入り、混雑傾向など。
@@ -30,7 +30,7 @@
 
 ## 監視・コスト
 - Azure Monitor / Application Insights でAPI・バッチを監視。
-- Azure Cost Alerts と Google Cloud Billing で費用アラート（`docs/operations/azure/AzureCostAlerts.md`、`docs/readiness/CostEstimation.md`）。
+- Azure Cost Alerts と Google Cloud Billing で費用アラート（`docs/operations/azure/AzureCostAlerts.md`、`docs/finance/CostEstimation.md`）。
 
 ## 法務・広告
 - 利用規約 / プライバシーポリシー / ブランドガイドラインを整備済み (`docs/product/TermsOfService.md`, `docs/product/PrivacyPolicy.md`, `docs/product/BrandGuidelines.md`)。
