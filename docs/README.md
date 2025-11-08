@@ -29,6 +29,7 @@
 
 ### blueprint/
 - `dataflow/`: 主要データフロー (SNS→AI, Google Places, Search, Favorites, Map, Monitoring)。
+- `interface/openapi.yaml`: 公開API仕様（Swagger/OpenAPI 3.0）。
 
 ## 推奨読了順
 1. **RequirementsDefinition.md** → プロダクト全体の目的・要件・最新技術決定を把握。

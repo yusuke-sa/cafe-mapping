@@ -55,7 +55,7 @@
 | 2025-11-11 | P1 | APIクォータ計画（Google Maps/Instagramの上限・アラート設計） |
 | 2025-11-12 | P1 | 全体アーキテクチャ図と主要コンポーネント洗い出し（`docs/architecture/architecture.drawio`） |
 | 2025-11-13 | P1 | データフロー/ETLシーケンスの詳細化（`docs/blueprint/dataflow/` 配下） |
-| 2025-11-14 | P1 | APIエンドポイント一覧とI/F仕様下書き |
+| 2025-11-14 | P1 | APIエンドポイント一覧とI/F仕様下書き（`docs/blueprint/interface/openapi.yaml`） |
 | 2025-11-15 | P1 | Azureリソース構成(Functions/Cosmos等)のSKU決定 |
 | 2025-11-16 | P1 | Infrastructure as Code方針検討(Bicep/ARM) |
 | 2025-11-17 | P1 | Azure Static Web Apps環境の初期セットアップ |
