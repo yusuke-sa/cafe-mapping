@@ -5,6 +5,8 @@
 - 参照: `architecture/ArchitectureCurrent.md`, `architecture/CacheStrategy.md`.
 
 ## 2. シーケンス概要
+> 同期方法: 初期段階では差分ポーリング（`/favorites?since=`）を採用。将来SignalR通知へ切り替える可能性あり。
+
 ```mermaid
 sequenceDiagram
     participant Frontend as Frontend (Next.js)
@@ -12,7 +14,7 @@ sequenceDiagram
     participant Cosmos as Cosmos DB (userFavorites)
     participant Redis as Azure Cache for Redis
     participant ChangeFn as Change Feed Functions
-    participant Frontend2 as 他デバイスFront
+    participant Frontend2 as 他デバイスFront (Polling/SignalR)
 
     Frontend->>APIFunc: POST /favorites {storeId, action}
     APIFunc->>Cosmos: Upsert userFavorites doc
@@ -21,7 +23,7 @@ sequenceDiagram
     APIFunc-->>Frontend: 成功レスポンス
     Cosmos-->>ChangeFn: Change Feed Event
     ChangeFn->>Redis: 更新/削除 (再同期用)
-    ChangeFn-->>Frontend2: (SignalR / Polling) 更新通知
+    ChangeFn-->>Frontend2: Polling応答 or SignalR通知
 ```
 
 ## 3. 詳細ステップ

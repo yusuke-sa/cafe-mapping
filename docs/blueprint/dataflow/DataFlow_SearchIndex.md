@@ -5,6 +5,8 @@
 - 参照資料: `architecture/ArchitectureCurrent.md`, `architecture/DataFlow_SNS_AI.md`, `architecture/DataFlow_GooglePlaces.md`, `product/RequirementsDefinition.md`.
 
 ## 2. シーケンス概要
+> バッチ処理: Cosmos Change Feedを最大100件/バッチで処理し、5分以内にSearchへ反映。ベクトル埋め込みはAzure OpenAIのEmbedding APIで再計算。
+
 ```mermaid
 sequenceDiagram
     participant Cosmos as Cosmos DB (Change Feed)
@@ -29,8 +31,8 @@ sequenceDiagram
    - ベクトル検索を利用する場合は、OpenAI Embedding等を再計算して `vector` フィールドに格納。
 
 3. **Cognitive Search 更新**
-   - `mergeOrUpload` で対象店舗ドキュメントをインデックスに反映。
-   - 失敗時はリトライ（指数バックオフ）。連続失敗はアラート。
+   - 1バッチ最大100件で `mergeOrUpload` を実行。ベクトル検索を利用する場合、OpenAI Embedding APIで512次元ベクトルを生成し `vector` フィールドに格納。
+   - 失敗時は指数バックオフ（1s, 3s, 9s）で3回再試行。連続失敗でアラートを送信し、手動再処理キューへ登録。
 
 4. **キャッシュ連動**
    - インデックス更新後、Redis `geo:bounds:*` など関連キーを削除または再生成して最新検索結果を反映。

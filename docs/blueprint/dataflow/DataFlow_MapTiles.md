@@ -33,7 +33,7 @@ sequenceDiagram
    - フロントは地図表示範囲（緯度経度の矩形）とフィルタ条件をクエリパラメータで送信。Front Doorで短期キャッシュ可。
 
 2. **キャッシュチェック**
-   - Redisキー: `geo:bounds:{latMin}:{latMax}:{lngMin}:{lngMax}:{filtersHash}`。
+   - Redisキー: `geo:bounds:{hash(latMin,latMax,lngMin,lngMax,zoom)}:{filtersHash}`（boundsをズーム込みで正規化しハッシュ化）。
    - ヒットの場合、GeoJSONレスポンスを即返却（TTL 5〜10分）。
 
 3. **データ生成（キャッシュミス時）**

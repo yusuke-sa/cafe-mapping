@@ -5,6 +5,8 @@
 - 参照ドキュメント: `architecture/ArchitectureCurrent.md`, `operations/meta/InstagramSetup.md`, `architecture/APIQuotaPlan.md`, `architecture/CacheStrategy.md`.
 
 ## 2. シーケンス概要
+> 実行頻度: 週2回、各バッチ最大150投稿。Instagram APIは1秒1リクエスト/連続100件でウェイトを入れる（`architecture/APIQuotaPlan.md`）。
+
 ```mermaid
 sequenceDiagram
     participant TimerFn as Azure Functions (Timer Trigger)
@@ -31,12 +33,12 @@ sequenceDiagram
 
 2. **データ整形**
    - 投稿本文、画像URL、位置情報、エンゲージメント数を構造化。
-   - 大量データの場合はバッチを分割し、APIクォータ制限を回避。
+   - 1バッチあたり最大150投稿、クォータ余裕がない場合は更に50件ごとに分割し、1秒ウェイトを挟む。
 
 3. **AI要約・タグ抽出**
    - Azure OpenAI (gpt-4o-mini) に要約プロンプトを送信。
-   - 雰囲気タグ（例: “落ち着いた”“作業向け”）とレビュー要約を生成。
-   - エラー時はリトライ → 連続失敗でアラート。
+   - 雰囲気タグ（例: “落ち着いた”“作業向け”）とレビュー要約を生成。1投稿につき最大1,000トークンを上限とする。
+   - エラー時は最大3回リトライ、連続バッチ失敗でアラート。
 
 4. **永続化**
    - Cosmos DBの店舗ドキュメントに upsert（AIフィールドを更新）。
