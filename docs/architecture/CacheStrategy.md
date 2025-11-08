@@ -1,4 +1,4 @@
-# キャッシュ戦略メモ（Redis / Front Door 前提）
+# キャッシュ戦略（Redis / Front Door 前提）
 
 ## 1. 目的
 - Map描画や検索結果を高速化し、Google Maps/Places API の呼び出し回数を削減する。
@@ -10,7 +10,7 @@
 | --- | --- | --- | --- |
 | ブラウザローカル | 地図タイルキャッシュ（Google提供）、短期設定・フィルタ状態 | LocalStorage / IndexedDB | 即時レスポンス、オフライン補助 |
 | エッジ | 画像/CSS/JS、Map初期GeoJSON | Azure Front Door + Static Web Apps | CDNで初期ロードを高速化 |
-| アプリ内キャッシュ | 店舗リスト、GeoJSON、AI要約 | Azure Cache for Redis (Standard C0〜) | Functionsのレスポンス高速化 |
+| アプリ内キャッシュ | 店舗リスト、GeoJSON、AI要約、お気に入り同期 | Azure Cache for Redis (Standard C0〜) | Functions/APIレスポンス高速化とクォータ節約 |
 | データ永続化 | 店舗メタ、レビュー要約、お気に入り同期 | Cosmos DB Serverless | 正規データソース |
 
 ## 3. Redis キャッシュ設計案
