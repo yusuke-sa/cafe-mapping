@@ -53,8 +53,8 @@
 | 2025-11-09 | P1 | 設計まわりの見直し（既存アーキテクチャ図の更新方針を決定） |
 | 2025-11-10 | P1 | キャッシュ戦略の検討（Redis/Front Door前提のキー設計・TTLプラン） |
 | 2025-11-11 | P1 | APIクォータ計画（Google Maps/Instagramの上限・アラート設計） |
-| 2025-11-12 | P1 | 全体アーキテクチャ図と主要コンポーネント洗い出し |
-| 2025-11-13 | P1 | データフロー/ETLシーケンスの詳細化 |
+| 2025-11-12 | P1 | 全体アーキテクチャ図と主要コンポーネント洗い出し（`docs/architecture/architecture.drawio`） |
+| 2025-11-13 | P1 | データフロー/ETLシーケンスの詳細化（`docs/blueprint/dataflow/` 配下） |
 | 2025-11-14 | P1 | APIエンドポイント一覧とI/F仕様下書き |
 | 2025-11-15 | P1 | Azureリソース構成(Functions/Cosmos等)のSKU決定 |
 | 2025-11-16 | P1 | Infrastructure as Code方針検討(Bicep/ARM) |
