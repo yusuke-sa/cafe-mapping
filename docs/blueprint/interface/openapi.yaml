@@ -1,0 +1,417 @@
+openapi: 3.0.3
+info:
+  title: Cafe Mapping API
+  version: 1.0.0
+servers:
+  - url: https://api.example.com
+    description: Azure Functions (production)
+security:
+  - OAuth2:
+      - api.read
+  - InviteKey: []
+paths:
+  /stores:
+    get:
+      summary: 店舗一覧を地図境界とフィルタで取得
+      security:
+        - OAuth2:
+            - api.read
+        - InviteKey: []
+      parameters:
+        - name: bounds
+          in: query
+          required: true
+          description: latMin,latMax,lngMin,lngMax をカンマ区切りで指定
+          schema:
+            type: string
+            example: "35.60,35.75,139.65,139.80"
+        - name: filters
+          in: query
+          required: false
+          description: カテゴリや雰囲気タグのフィルタ(JSONをBase64エンコード)
+          schema:
+            type: string
+        - name: query
+          in: query
+          required: false
+          description: 店舗名やタグのキーワード検索
+          schema:
+            type: string
+        - name: sort
+          in: query
+          required: false
+          description: 並び替え (distance, rating, popularity)
+          schema:
+            type: string
+            enum: [distance, rating, popularity]
+        - name: limit
+          in: query
+          required: false
+          description: 取得件数の上限 (1〜200)
+          schema:
+            type: integer
+            default: 50
+        - name: lang
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ja, en]
+      responses:
+        '200':
+          description: GeoJSON形式の店舗情報
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoJSON'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /stores/{storeId}:
+    get:
+      summary: 店舗詳細
+      security:
+        - OAuth2:
+            - api.read
+        - InviteKey: []
+      parameters:
+        - in: path
+          name: storeId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 店舗詳細
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /favorites:
+    get:
+      summary: お気に入り一覧（差分同期）
+      security:
+        - OAuth2:
+            - api.read
+        - InviteKey: []
+      parameters:
+        - name: since
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteSync'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      summary: お気に入り登録/解除
+      security:
+        - OAuth2:
+            - api.write
+        - InviteKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FavoriteRequest'
+      parameters:
+        - name: If-Match
+          in: header
+          required: false
+          description: 現在のETag（`FavoriteSync.etag`）
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /search/autocomplete:
+    get:
+      summary: Places Autocomplete プロキシ
+      security:
+        - OAuth2:
+            - api.read
+        - InviteKey: []
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: sessionToken
+          in: query
+          required: true
+          description: クライアントが生成するUUID/GUID（1セッションに固定）
+          schema:
+            type: string
+        - name: location
+          in: query
+          required: false
+          description: lat,lng
+          schema:
+            type: string
+            example: "35.68,139.76"
+        - name: language
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "ja"
+        - name: types
+          in: query
+          required: false
+          description: place types (comma separated)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutocompleteResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://login.microsoftonline.com/{tenant-id}/oauth2/v2.0/token
+          scopes:
+            api.read: 読み取り専用アクセス
+            api.write: 読み書きアクセス
+            api.admin: 管理操作
+    InviteKey:
+      type: apiKey
+      in: header
+      name: X-Invite-Token
+  schemas:
+    GeoJSON:
+      type: object
+      properties:
+        type:
+          type: string
+          example: FeatureCollection
+        features:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: Feature
+              geometry:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: Point
+                  coordinates:
+                    type: array
+                    items:
+                      type: number
+              properties:
+                type: object
+                properties:
+                  storeId:
+                    type: string
+                  name:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+    StoreDetail:
+      type: object
+      properties:
+        storeId:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        coords:
+          type: object
+          properties:
+            lat:
+              type: number
+            lng:
+              type: number
+        summary:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        reviews:
+          type: array
+          items:
+            type: object
+            properties:
+              author:
+                type: string
+              rating:
+                type: number
+              text:
+                type: string
+              time:
+                type: string
+        favoritesCount:
+          type: integer
+    FavoriteRequest:
+      type: object
+      required:
+        - storeId
+        - action
+        - etag
+      properties:
+        storeId:
+          type: string
+        action:
+          type: string
+          enum: [add, remove]
+        note:
+          type: string
+        etag:
+          type: string
+    FavoriteSync:
+      type: object
+      properties:
+        lastSync:
+          type: string
+          format: date-time
+        etag:
+          type: string
+          description: 差分バージョン
+        favorites:
+          type: array
+          items:
+            type: object
+            properties:
+              storeId:
+                type: string
+              note:
+                type: string
+              updatedAt:
+                type: string
+                format: date-time
+              action:
+                type: string
+                enum: [add, remove]
+    AutocompleteResponse:
+      type: object
+      properties:
+        predictions:
+          type: array
+          items:
+            type: object
+            properties:
+              description:
+                type: string
+              placeId:
+                type: string
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ERR_BAD_REQUEST
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+  responses:
+    Unauthorized:
+      description: 認証エラー
+      headers:
+        WWW-Authenticate:
+          schema:
+            type: string
+          description: Bearer realm情報
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    BadRequest:
+      description: パラメータエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyRequests:
+      description: クォータ/レート制限
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            description: 秒数
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: サーバーエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: リソース未検出
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: 同期衝突 / 状態不一致
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
