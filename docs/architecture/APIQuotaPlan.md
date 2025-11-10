@@ -20,7 +20,7 @@
   - Places Details: 160コール（80%）でSoft、200コールでHard。  
   - Autocomplete: 160/200で同上。
 - **通知チャネル**: メール + Slack（Incoming Webhook）で即時共有。
-- **屋内キャッシュ連携**: `docs/architecture/CacheStrategy.md` に基づくRedisキーでGeoJSON/Placesレスポンスをキャッシュし、80%超過時はTTLを延長して呼び出しを抑制。
+- **キャッシュ連携**: `docs/architecture/CacheStrategy.md` に基づき、CosmosのETagとブラウザ/EdgeキャッシュでGeoJSON・Placesレスポンスを再利用。80%超過時は`Cache-Control` TTLを延長し呼び出しを抑制。
 
 ### 2.3 フェイルバック方針
 - 地図ロード失敗時: デフォルトエリア（東京23区）のスタティックマップと、最後に取得したGeoJSONを表示。
@@ -43,9 +43,9 @@
 - ポリシー違反が疑われる場合、アプリを開発モードへ戻すフローをドキュメント化。
 
 ## 4. キャッシュ・デグレード戦略
-- Google/InstagramレスポンスはCosmos DB + Redisにキャッシュし、同一データの再取得を最小化（`docs/architecture/CacheStrategy.md`）。
+- Google/InstagramレスポンスはCosmos DB + ブラウザ/Edgeキャッシュに保存し、同一データの再取得を最小化（`docs/architecture/CacheStrategy.md`）。
 - クォータ超過アラート発生時は以下優先度で対処:
-  1. Redis/Front DoorのTTL調整、レスポンス削減（返却項目縮小）。
+  1. Cache-Control TTLや差分取得間隔を調整し、レスポンスを縮小。
   2. ポーリング間隔を一時的に延長（Instagram週1回、Places詳細48hなど）。
   3. 必要に応じてユーザーへ「最新情報更新を一時的に制限しています」と告知。
 

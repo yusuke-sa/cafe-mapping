@@ -13,15 +13,13 @@ sequenceDiagram
     participant IGAPI as Instagram Graph API
     participant OpenAI as Azure OpenAI
     participant Cosmos as Azure Cosmos DB
-    participant Redis as Azure Cache for Redis
     participant Monitor as App Insights
 
     TimerFn->>IGAPI: 投稿データ取得 (差分/週2回)
     IGAPI-->>TimerFn: 投稿リスト (JSON)
     TimerFn->>OpenAI: 要約/タグ生成 (gpt-4o-mini)
     OpenAI-->>TimerFn: 要約テキスト/タグ
-    TimerFn->>Cosmos: upsert 店舗ドキュメント
-    TimerFn->>Redis: store:{id}:detail キャッシュ更新
+    TimerFn->>Cosmos: upsert 店舗ドキュメント (ETag更新)
     TimerFn->>Monitor: 成功/失敗ログ + メトリクス
 ```
 
@@ -29,7 +27,7 @@ sequenceDiagram
 1. **トリガー & 差分抽出**
    - タイマートリガーFunctionsが週2回起動。
    - Instagram Graph APIを呼び出し、ハッシュタグやビジネスアカウントに紐づく最新投稿を取得。
-   - 最終取得時刻をCosmos/Redisに保存し、差分のみ処理。
+   - 最終取得時刻をCosmosに保存し、差分のみ処理。
 
 2. **データ整形**
    - 投稿本文、画像URL、位置情報、エンゲージメント数を構造化。
@@ -41,12 +39,12 @@ sequenceDiagram
    - エラー時は最大3回リトライ、連続バッチ失敗でアラート。
 
 4. **永続化**
-   - Cosmos DBの店舗ドキュメントに upsert（AIフィールドを更新）。
+   - Cosmos DBに upsert。ETagを更新し、クライアント側はIf-None-Match/If-Matchで差分取得。
    - Change Feedを介してCognitive Searchや他処理へ伝搬。
 
 5. **キャッシュ更新**
-   - Redis `store:{storeId}:detail` を更新し、フロントのレスポンスを高速化。
-   - TTLは1時間、必要に応じて延長。
+   - サーバ側キャッシュは保持せず、CosmosのETag＋ブラウザIndexedDBでキャッシュ。
+   - 画面はETagが一致した場合ローカルデータを使用し、不一致時のみ再取得。
 
 6. **監視・アラート**
    - Application Insightsで成功/失敗を記録。

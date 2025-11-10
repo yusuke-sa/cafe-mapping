@@ -1,7 +1,7 @@
 # データフロー: Google Places 詳細 / 口コミ取得
 
 ## 1. 背景
-- Google Places API (Details / Autocomplete) を利用して最新の店舗情報と口コミを取得し、Cosmos DB と Redis に反映する。
+- Google Places API (Details / Autocomplete) を利用して最新の店舗情報と口コミを取得し、Cosmos DB とブラウザ/Edgeキャッシュに反映する。
 - 参考資料: `architecture/ArchitectureCurrent.md`, `architecture/APIQuotaPlan.md`, `architecture/CacheStrategy.md`, `operations/gcp/GoogleCloudSetup.md`.
 
 ## 2. シーケンス概要
@@ -9,22 +9,20 @@
 sequenceDiagram
     participant Frontend as Frontend (Next.js)
     participant APIFunc as Azure Functions (HTTP Trigger)
-    participant Redis as Azure Cache for Redis
     participant Places as Google Places API
     participant Cosmos as Azure Cosmos DB
     participant Monitor as App Insights
 
     Frontend->>APIFunc: /stores/{id} or /places/details
-    APIFunc->>Redis: Get meta:places:{placeId}
-    alt Cache Hit
-        Redis-->>APIFunc: Cached details/Reviews
-    else Cache Miss
+    APIFunc->>Cosmos: Check cached details (ETag)
+    alt ETag Fresh
+        Cosmos-->>APIFunc: 最新データ (24h以内)
+    else Refresh
         APIFunc->>Places: Places Details API call (fields限定)
         Places-->>APIFunc: Details + reviews (≤5件)
-        APIFunc->>Redis: Set meta:places:{placeId} (TTL 24h)
         APIFunc->>Cosmos: Upsert store document (latest info)
     end
-    APIFunc-->>Frontend: 店舗詳細 + 口コミ
+    APIFunc-->>Frontend: 店舗詳細 + 口コミ + ETag
     APIFunc->>Monitor: 成功/失敗ログ + クォータメトリクス
 ```
 
@@ -33,17 +31,17 @@ sequenceDiagram
    - フロントの店舗詳細画面、またはバックエンドのバッチ更新から Functions API が呼ばれる。
 
 2. **キャッシュ確認**
-   - Redis `meta:places:{placeId}` キーをチェック。存在すれば即返却。
-   - 無ければGoogle Places APIへリクエスト。`fields=place_id,name,geometry,opening_hours,reviews,rating,price_level,photos` など必要項目に限定。
+   - Cosmos DBの `placeCache` ドキュメントを確認し、`lastFetched` が24時間以内・ETag一致なら返却。
+   - 期限切れの場合のみGoogle Places APIへリクエスト。`fields=place_id,name,geometry,opening_hours,reviews,rating,price_level,photos` など必要項目に限定。
 
 3. **レスポンス処理**
    - レビューは最新5件のみ保持。レビュアー名・投稿日を含む。
    - 画像URL・営業時間などを正規化し、Functions内のDTOに変換。
 
 4. **永続化 / キャッシュ**
-   - Cosmos DBの `stores` コレクションへ upsert（Places由来フィールド更新）。
-- Redisに24時間TTLで保存（Googleポリシーに基づき長期保存しない）。口コミはAPIレスポンスのまま最大5件に限定し、レビュアー名・投稿日を必ず保持。
-- クォータ80%到達時はTTLを延ばして呼び出しを抑制。
+   - Cosmos DBの `stores` コレクションへ upsert（Placesフィールド更新＋ETag保存）。
+   - 口コミはAPIレスポンスのまま最大5件に限定し、レビュアー名・投稿日を必ず保持。
+   - フロントはETag一致時はIndexedDBのキャッシュを利用。クォータ80%超過時は`Cache-Control`を延長し再取得を抑制。
 
 5. **エラー / フェイルバック**
    - Places APIが失敗した場合は、Cosmosの最後のデータを返す。
@@ -54,19 +52,12 @@ sequenceDiagram
 sequenceDiagram
     participant Frontend
     participant APIFunc
-    participant Redis
     participant Places
 
-    Frontend->>APIFunc: /search/autocomplete?query=...
-    APIFunc->>Redis: Get search:auto:{hash(query)}
-    alt Hit
-        Redis-->>APIFunc: 候補リスト
-    else Miss
-        APIFunc->>Places: Places Autocomplete API
-        Places-->>APIFunc: 候補リスト
-        APIFunc->>Redis: Set search:auto:{hash(query)} (TTL 5分)
-    end
-    APIFunc-->>Frontend: 候補一覧
+    Frontend->>APIFunc: /search/autocomplete?query=...&sessionToken=GUID
+    APIFunc->>Places: Places Autocomplete API
+    Places-->>APIFunc: 候補リスト
+    APIFunc-->>Frontend: 候補一覧 (Cache-Control: private,max-age=60)
 ```
 
 ## 5. アラート / クォータ管理
@@ -75,6 +66,6 @@ sequenceDiagram
 - 80%超過時はキャッシュTTL延長、Autocomplete入力回数制限など緊急対策を適用。
 
 ## 6. 次のアクション
-1. Functions側にキャッシュインターフェースを実装し、Redis未導入環境ではメモリスタブで置換。
+1. sessionToken のGUID生成・再利用ロジックをフロントに実装。
 2. レスポンスDTOとCosmosスキーマを定義（Places由来フィールドのマッピング表含む）。
 3. アラート設定（Google Budgets / App Insights）を `architecture/APIQuotaPlan.md` に合わせて自動化。

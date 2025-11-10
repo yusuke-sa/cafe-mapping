@@ -1,0 +1,55 @@
+<mxfile host="app.diagrams.net" modified="2025-10-30T13:10:00.000Z" agent="7.0" version="24.4.10" editor="undefined" type="device">
+  <diagram id="network-min" name="Network-Minimal">
+    <mxGraphModel dx="1086" dy="677" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="internet" value="Internet" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="dns" value="Azure DNS" style="shape=cloud;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="200" y="190" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="domain" value="Custom Domain" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656" vertex="1" parent="1">
+          <mxGeometry x="380" y="210" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="swa" value="Azure Static Web Apps&#10;(Free/Standard)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="580" y="170" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="func" value="Azure Functions&#10;(Consumption)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="580" y="330" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="cosmos" value="Cosmos DB Serverless" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00" vertex="1" parent="1">
+          <mxGeometry x="840" y="150" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="openai" value="Azure OpenAI (gpt-4o-mini)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00" vertex="1" parent="1">
+          <mxGeometry x="840" y="370" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="monitor" value="Azure Monitor / App Insights" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6" vertex="1" parent="1">
+          <mxGeometry x="840" y="480" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" style="endArrow=block;html=1;strokeColor=#333333" edge="1" parent="1" source="internet" target="dns">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" style="endArrow=block;html=1;strokeColor=#333333" edge="1" parent="1" source="dns" target="domain">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" style="endArrow=block;html=1;strokeColor=#333333" edge="1" parent="1" source="domain" target="swa">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge4" style="endArrow=block;html=1;strokeColor=#b85450" edge="1" parent="1" source="swa" target="func">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge5" style="endArrow=block;html=1;strokeColor=#d79b00" edge="1" parent="1" source="func" target="cosmos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge7" style="endArrow=block;html=1;strokeColor=#d79b00" edge="1" parent="1" source="func" target="openai">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge8" style="endArrow=block;html=1;strokeColor=#9673a6" edge="1" parent="1" source="func" target="monitor">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

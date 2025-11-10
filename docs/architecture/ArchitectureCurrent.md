@@ -24,7 +24,7 @@
 ## データストア/検索
 - **Cosmos DB (Serverless)**: 店舗メタデータ、AIタグ、お気に入り、混雑傾向など。
 - **Azure Cognitive Search (Basic)**: 店舗名・タグ・設備検索、ベクトルベースのハイブリッド検索も視野。
-- **Azure Cache for Redis**: Functionsレスポンスの高速化（地図領域、店舗詳細、お気に入り同期）に利用。Front Doorとの組み合わせでスケールを最適化。
+- **キャッシュ**: ブラウザIndexedDB、Static Web Appsのエッジキャッシュ、Cosmos ETagを併用。サーバ側キャッシュは必要に応じてFunctions内メモリ/ App Service Cache (Basic) を検討。
 
 ## 外部連携
 - Instagram Graph API（Meta審査が前提）、Google Maps/Places API（個人利用でも課金設定必須）。

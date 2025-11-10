@@ -11,7 +11,7 @@
 ### architecture/
 - `ArchitectureCurrent.md`: 現行アーキテクチャ + 依存関係/ボトルネック。
 - `architecture.drawio`: 全体構成図（draw.io形式）。
-- `CacheStrategy.md`: Redis / Front Door を使ったキャッシュ戦略。
+- `CacheStrategy.md`: ブラウザ/Edge/Cosmos中心のキャッシュ戦略（必要に応じて軽量サーバキャッシュ）。
 - `APIQuotaPlan.md`: Google Maps / Instagram のクォータ & アラート設計。
 - `DataFlow_*.md`: SNS→AI、Places詳細、検索インデックス更新、お気に入り同期、Map描画、監視など6本のデータフロー。
 

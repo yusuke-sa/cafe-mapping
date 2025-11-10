@@ -63,7 +63,7 @@
 - **フロントエンド**: Next.js 15 (App Router) + React 19 + TypeScript。Google Maps JavaScript APIをラップし、MUIなどのUIライブラリでアクセシビリティを担保。Azure Static Web Appsへデプロイしてグローバルエッジ配信を行う。
 - **バックエンド/API**: Azure Functions (Node.js 22 + TypeScript) を採用。HTTPトリガーには Hono を統一的に組み込み、Fetch API ベースの軽量ルーティングと型安全なAPI実装を行う。タイマートリガーでSNS収集・AI要約バッチを実行。
 - **データ処理**: Azure FunctionsベースのETLと、必要に応じてAzure Data Factory。AI推論はAzure OpenAI（gpt-4o-mini等）をFunctionsから呼び出し、Python/TypeScript双方で拡張可能とする。
-- **データベース**: 店舗メタデータはAzure Cosmos DB (Serverless) を中心に、テキスト・ベクトル検索はAzure Cognitive Search (Hybrid) を活用。必要に応じてAzure Cache for Redisでレスポンスを高速化。
+- **データベース**: 店舗メタデータはAzure Cosmos DB (Serverless) を中心に、テキスト・ベクトル検索はAzure Cognitive Search (Hybrid) を活用。キャッシュはブラウザ/Edge/CosmosのETagで補い、必要に応じてFunctions内メモリやApp Service Cacheを使用。
 - **インフラ/運用**: Azure Static Web Apps + Azure Functions + Cosmos DB + Cognitive Searchの統合構成。監視はAzure Monitor / Application Insights、CI/CDはGitHub Actionsで管理。
 
 ## 10. 外部連携・API

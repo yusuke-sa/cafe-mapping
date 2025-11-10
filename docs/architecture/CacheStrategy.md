@@ -1,51 +1,41 @@
-# キャッシュ戦略（Redis / Front Door 前提）
+# キャッシュ戦略（ブラウザ / Edge / Cosmos 中心）
 
 ## 1. 目的
-- Map描画や検索結果を高速化し、Google Maps/Places API の呼び出し回数を削減する。
-- 将来的なユーザー増加時にAzure Front Door / Azure Cache for Redisを導入しやすい設計を固める。
-- お気に入り等のユーザー関連データをCosmos DB＋Redisでマルチデバイス同期できるようにする。
+- Redis を撤去しつつ、Map描画・検索結果・お気に入り同期の体感速度を維持する。
+- 無料枠主体の構成で月額コストを抑え、必要になればサーバ側メモリキャッシュやFront Doorを追加できる状態にする。
 
 ## 2. キャッシュレイヤ概要
 | レイヤ | 対象 | 技術 | 役割 |
 | --- | --- | --- | --- |
-| ブラウザローカル | 地図タイルキャッシュ（Google提供）、短期設定・フィルタ状態 | LocalStorage / IndexedDB | 即時レスポンス、オフライン補助 |
-| エッジ | 画像/CSS/JS、Map初期GeoJSON | Azure Front Door + Static Web Apps | CDNで初期ロードを高速化 |
-| アプリ内キャッシュ | 店舗リスト、GeoJSON、AI要約、お気に入り同期 | Azure Cache for Redis (Standard C0〜) | Functions/APIレスポンス高速化とクォータ節約 |
-| データ永続化 | 店舗メタ、レビュー要約、お気に入り同期 | Cosmos DB Serverless | 正規データソース |
+| ブラウザローカル | GeoJSONタイル、フィルタ状態、店舗詳細 | IndexedDB / LocalStorage | 即時レスポンス、オフライン補助。boundsハッシュごとに5〜10分保持。 |
+| エッジ | 静的アセット、GeoJSON API | Static Web Apps (CDN) / Cache-Control | `Cache-Control: public,max-age=300` などでクラウド側キャッシュ。 |
+| アプリ内（任意） | ホットデータ | Functions内メモリ (Durable cache) or App Service Cache (Basic Shared) | Redis代替。プロセスリサイクルに備えて短TTL (60秒)。 |
+| データ永続化 | 店舗・口コミ・AI要約・お気に入り | Cosmos DB Serverless | 正規データソース。ETagで差分同期。 |
 
-## 3. Redis キャッシュ設計案
-- **キー命名規則**
-  - `geo:bounds:{latMin}:{latMax}:{lngMin}:{lngMax}` … 地図表示領域ごとの店舗配列。
-  - `store:{storeId}:detail` … 店舗詳細＋AI要約。
-  - `user:{userId}:favorites` … お気に入りID一覧（Cosmosをバックエンドとし、Redisは読み取りキャッシュ）。
-  - `meta:places:{placeId}` … Google Places APIレスポンスのキャッシュ。
-- **TTL 方針**
-  - 地図領域: 5〜10分（人気スポット更新に追従しつつ Places API 呼び出しを抑制）。
-  - 店舗詳細: 1時間（AI要約再生成や営業時間更新頻度次第で調整）。
-  - お気に入り: 1分（ほぼリアルタイム反映、同期衝突を最小化）。
-  - Placesレスポンス: 24時間以内で再取得（Googleポリシーに準拠）。
-- **ライトスルー/ライトビハインド**
-  - ユーザーお気に入り操作はまずCosmos DBに書き込み、その結果をRedisに反映（ライトスルー）。
-  - バッチ処理でPlaces等を取得した際はRedisにも保存し、Functions/Front Doorから参照。
+## 3. GeoJSON / Map描画
+- フロントは bounds + filters を正規化したhash (`hash(latMin,latMax,lngMin,lngMax,zoom,filters)`) をキーにし、IndexedDBへ保存。
+- APIレスポンスに `Cache-Control: public,max-age=300` を付与し、Static Web Apps/CDNヒットを狙う。Functions側ではCosmos検索のみ。
+- キャッシュミス時だけCosmos + Cognitive Searchに問い合わせ、レスポンスサイズを20KB以下に抑制する。
 
-## 4. Front Door / CDN 設計
-- Azure Front Door をStatic Web Appsの前段に置き、地理的に近いエッジからNext.js静的アセットを配信。
-- APIレスポンス（地図領域ごとのGeoJSON）もFront Doorで短時間キャッシュする（Cache-Controlヘッダーで5分程度）。
-- 認証付きAPIはFront Doorでキャッシュせず、FunctionsでRedisヒットを狙う。
+## 4. 店舗詳細・Placesレスポンス
+- 店舗詳細APIはCosmosのETagを返却。クライアントはETag一致時にローカルキャッシュを利用、差異がある場合のみ再取得。
+- Places口コミはCosmosに保存し、`lastFetched` が24時間以内なら再利用。Google API呼び出しを最小化。
 
-## 5. マルチデバイス同期（お気に入り）
-1. お気に入り追加/削除をFunctions APIへ送信 → Cosmos DBに永続化。
-2. Cosmos DB Change Feed で更新イベントを取得し、Redis `user:{userId}:favorites` を更新。
-3. フロントは起動時にCosmosからフル同期（もしくはFunctions APIがRedisから取得）。
-4. LocalStorageとは別に、最終同期時刻を保持し、差分同期APIを提供（例: `/favorites?since=...`）。
-5. 将来的にリアルタイム性が必要ならAzure SignalR Serviceを併用し、他デバイスへプッシュ通知。
+## 5. お気に入り同期
+1. `/favorites` POSTで `etag` (前回の `FavoriteSync.etag`) を送信。Cosmos upsert後の新しいETagをレスポンス。
+2. `/favorites?since=` で差分を取得し、LocalStorageを更新。SignalRは不要（ポーリングで十分）。
+3. Functions内メモリキャッシュ（辞書）を使う場合はユーザーIDごとにTTL 60秒で保持し、Cosmos読み込み頻度を抑制。
 
-## 6. 実装タスク案
-1. Functionsレスポンス用のキャッシュインターフェースを作成（Redis未導入時はメモリスタブ）。
-2. マップ領域ごとのGeoJSON生成APIにキー設計を適用し、URQL等でキャッシュ利用。
-3. お気に入りAPIをCosmos書き込み→Redis更新のライトスルー構成に変更し、マルチデバイス同期を実装。
-4. Front Door導入時にCache Rules/ヘッダー設定をドキュメント化。
-5. Places/APIクォータ計画と連携し、キャッシュヒット率をモニタリング（Application Insights + Redis Metrics）。
+## 6. サーバ側キャッシュ（オプション）
+- どうしてもサーバでキャッシュしたい場合は以下を検討:
+  - **Functions Durable cache**: インメモリ辞書 + `context.executionContext.functionName` に紐づくSingleton。コールドスタートやスケールアウト時はリセットされるためTTL短めに設定。
+  - **Azure App Service Cache (Basic/Shared)**: $2〜$5/月。Redisより安価で、一時的にセッションやGeoJSONを保持できる。
+
+## 7. 実装タスク
+1. GeoJSON APIのレスポンスに `Cache-Control` ヘッダーを付与し、フロントでboundsハッシュ管理を実装。
+2. `/stores/{id}` と `/favorites` のレスポンスにETagを含め、フロントでIf-None-Match/If-Matchヘッダーを設定。
+3. Functionsに簡易メモリキャッシュ層を実装（有効時のみ）。必要な場合にApp Service Cacheへ切替できるよう抽象化。
+4. Application Insightsで `cache_hit` / `cache_miss` を記録し、ヒット率が50%未満ならログをもとにTTLやキー設計を調整。
 
 ---
-これらをフェーズ1（設計見直し）でドキュメント化し、必要に応じてフェーズ2以降で実装する。
+Redisを完全に撤去しても、上記のブラウザ＋エッジ＋Cosmos ETag方式でユーザー体験は維持できる。将来、負荷が増えた場合にのみRedisやFront Door Premiumを再導入する。
