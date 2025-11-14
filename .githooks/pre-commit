@@ -1,2 +1,22 @@
 #!/bin/sh
+# コミット前に自動で Lint & Build チェック
+
+echo "🧹 Running lint..."
 npm run lint
+LINT_EXIT_CODE=$?
+
+if [ $LINT_EXIT_CODE -ne 0 ]; then
+  echo "❌ Lint error detected! Commit aborted."
+  exit 1
+fi
+
+echo "🏗️ Running build..."
+npm run build
+BUILD_EXIT_CODE=$?
+
+if [ $BUILD_EXIT_CODE -ne 0 ]; then
+  echo "❌ Build failed! Commit aborted."
+  exit 1
+fi
+
+echo "✅ All checks passed. Proceeding with commit."
