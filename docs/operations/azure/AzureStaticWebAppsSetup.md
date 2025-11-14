@@ -38,7 +38,7 @@ param branch = 'main'
 param appLocation = 'src/apps/frontend'
 param appArtifactLocation = '.next'
 param tags = {
-  project: 'cafe-mapping'
+  project: 'iijan-map'
   environment: 'dev'
 }
 ```

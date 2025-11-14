@@ -11,7 +11,7 @@ param name string
 ])
 param skuName string = 'Free'
 
-@description('GitHub repository URL that hosts the monorepo ( e.g. https://github.com/yusuke/cafe-mapping ).')
+@description('GitHub repository URL that hosts the monorepo ( e.g. https://github.com/yusuke/iijan-map ).')
 param repositoryUrl string
 
 @description('Branch to build and deploy (typically main).')
