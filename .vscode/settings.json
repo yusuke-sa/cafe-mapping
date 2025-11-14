@@ -23,5 +23,13 @@
   "eslint.validate": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
   "eslint.workingDirectories": [".", "src/apps/backend", "src/apps/frontend", "src/infra"],
   "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "azureFunctions.deploySubpath": "src/apps/backend",
+  "azureFunctions.postDeployTask": "npm install (functions)",
+  "azureFunctions.projectLanguage": "TypeScript",
+  "azureFunctions.projectRuntime": "~4",
+  "debug.internalConsoleOptions": "neverOpen",
+  "azureFunctions.projectLanguageModel": 4,
+  "azureFunctions.projectSubpath": "src/apps/backend",
+  "azureFunctions.preDeployTask": "npm prune (functions)"
 }

@@ -47,11 +47,13 @@
    npm install
    ```
 4. **Git hooks の有効化（推奨）**
+
    ```bash
    git config core.hooksPath .githooks
    ```
 
    - コミット前に `npm run lint` が自動実行され、品質チェックを強制できる。
+
 5. **Azure Functions Core Tools のインストール**（バックエンド開発に必須）
    - macOS (Homebrew):
      ```bash
