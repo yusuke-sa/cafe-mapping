@@ -65,6 +65,7 @@
 - **データ処理**: Azure FunctionsベースのETLと、必要に応じてAzure Data Factory。AI推論はAzure OpenAI（gpt-4o-mini等）をFunctionsから呼び出し、Python/TypeScript双方で拡張可能とする。
 - **データベース**: 店舗メタデータはAzure Cosmos DB (Serverless) を中心に、テキスト・ベクトル検索はAzure Cognitive Search (Hybrid) を活用。キャッシュはブラウザ/Edge/CosmosのETagで補い、必要に応じてFunctions内メモリやApp Service Cacheを使用。
 - **インフラ/運用**: Azure Static Web Apps + Azure Functions + Cosmos DB + Cognitive Searchの統合構成。監視はAzure Monitor / Application Insights、CI/CDはGitHub Actionsで管理。
+- **IaC**: Azure Bicepで全リソース（Static Web Apps、Functions、Cosmos DB、Cognitive Search 等）をコード管理し、`.bicepparam`で環境差分を吸収する。
 
 ## 10. 外部連携・API
 - SNSデータ: Instagram Graph API、TikTok、Twitter(X)などの公開API。利用制限・承認手続きに合わせた実装が必要。
