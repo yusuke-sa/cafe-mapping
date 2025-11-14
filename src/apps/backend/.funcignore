@@ -1,0 +1,7 @@
+*.ts
+node_modules
+.git*
+.vscode
+local.settings.json
+pnpm-lock.yaml
+dist

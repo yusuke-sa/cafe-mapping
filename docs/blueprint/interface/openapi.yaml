@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Cafe Mapping API
+  title: iijan-map API
   version: 1.0.0
 servers:
   - url: https://api.example.com
@@ -24,7 +24,7 @@ paths:
           description: latMin,latMax,lngMin,lngMax をカンマ区切りで指定
           schema:
             type: string
-            example: "35.60,35.75,139.65,139.80"
+            example: '35.60,35.75,139.65,139.80'
         - name: filters
           in: query
           required: false
@@ -188,13 +188,13 @@ paths:
           description: lat,lng
           schema:
             type: string
-            example: "35.68,139.76"
+            example: '35.68,139.76'
         - name: language
           in: query
           required: false
           schema:
             type: string
-            example: "ja"
+            example: 'ja'
         - name: types
           in: query
           required: false

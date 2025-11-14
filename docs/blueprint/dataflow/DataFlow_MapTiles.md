@@ -1,10 +1,12 @@
 # データフロー: Map描画データ生成 / キャッシュ
 
 ## 1. 目的
+
 - 地図表示エリアに応じて店舗データを高速に返し、Google Maps/Places への無駄なリクエストを削減する。
 - 静的キャッシュ (SWA/CDN) + ブラウザ IndexedDB を中心に高速化し、サーバ側キャッシュを最小限にする。
 
 ## 2. シーケンス概要
+
 ```mermaid
 sequenceDiagram
     participant Frontend as Frontend (Next.js)
@@ -27,6 +29,7 @@ sequenceDiagram
 ```
 
 ## 3. 詳細ステップ
+
 1. **リクエスト受付**
    - フロントは地図表示範囲（緯度経度の矩形）とフィルタ条件をクエリパラメータで送信。Front Doorで短期キャッシュ可。
 
@@ -48,10 +51,12 @@ sequenceDiagram
    - キャッシュミスが続く場合はTTLを延長 or bounds分割ロジックを調整。
 
 ## 4. フェイルバック
+
 - Cognitive Search でエラー発生時はCosmos DBの簡易クエリで最低限の店舗一覧を返却。
 - サーバ側キャッシュは持たないため、Functionsでのメモリキャッシュは任意。必要なら短TTLの辞書を利用。
 
 ## 5. TODO / 次アクション
+
 1. GeoJSON生成ロジックを共通化し、テストを作成。
 2. Front Door を導入する場合、Cache-Controlヘッダーを設定してエッジキャッシュを有効化。
 3. Boundsハッシュ・フィルタハッシュのアルゴリズムをドキュメント化（クライアント/サーバで共通化）。

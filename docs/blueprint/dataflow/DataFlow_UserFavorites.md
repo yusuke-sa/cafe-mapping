@@ -1,10 +1,12 @@
 # データフロー: お気に入り・ユーザーデータ同期
 
 ## 1. 目的
+
 - フロントエンドで行ったお気に入り操作を Azure Functions 経由で Cosmos DB に永続化し、ETagベースの差分同期で複数デバイスを同期する。
 - 参照: `architecture/ArchitectureCurrent.md`, `architecture/CacheStrategy.md`.
 
 ## 2. シーケンス概要
+
 > 同期方法: 初期段階では差分ポーリング（`/favorites?since=`）を採用。将来SignalR通知へ切り替える可能性あり。
 
 ```mermaid
@@ -24,6 +26,7 @@ sequenceDiagram
 ```
 
 ## 3. 詳細ステップ
+
 1. **リクエスト受付**
    - フロントは「お気に入り追加/削除」をAPI (`POST /api/favorites`) に送信。
    - Bodyには `storeId`, `note`, `action(add/remove)`, `etag` (前回のバージョン) を含める。
@@ -45,11 +48,13 @@ sequenceDiagram
    - ローカルStorageのキャッシュを更新し、UIに反映。SignalR導入時はPushでトリガー。
 
 ## 4. エラー処理
+
 - Cosmos書き込み失敗時はリトライし、失敗継続ならユーザーにメッセージを表示。
 - Change Feed Functions でエラーが出た場合、再処理キュー（Azure Storage Queue）に積んで再実行。
 - 409 Conflict が返却された場合は最新ETagでリトライするようクライアントに指示。
 
 ## 5. TODO / 次アクション
+
 1. APIスキーマ（`storeId`, `note`, `action`, `etag`）とCosmosドキュメント構造（`{userId, items[], etag}`）を定義。
 2. SignalRを導入するか、ポーリング差分APIで十分か決める。
 3. アクセス制御（招待制ユーザーのみ）のフィルターをFunctionsに実装。

@@ -1,10 +1,12 @@
 # データフロー: SNS収集 → AI要約 → 永続化
 
 ## 1. 背景
+
 - InstagramやGoogle Placesなどの公開情報を統合し、雰囲気タグや要約を生成してCosmos DBに保存する。
 - 参照ドキュメント: `architecture/ArchitectureCurrent.md`, `operations/meta/InstagramSetup.md`, `architecture/APIQuotaPlan.md`, `architecture/CacheStrategy.md`.
 
 ## 2. シーケンス概要
+
 > 実行頻度: 週2回、各バッチ最大150投稿。Instagram APIは1秒1リクエスト/連続100件でウェイトを入れる（`architecture/APIQuotaPlan.md`）。
 
 ```mermaid
@@ -24,6 +26,7 @@ sequenceDiagram
 ```
 
 ## 3. 詳細ステップ
+
 1. **トリガー & 差分抽出**
    - タイマートリガーFunctionsが週2回起動。
    - Instagram Graph APIを呼び出し、ハッシュタグやビジネスアカウントに紐づく最新投稿を取得。
@@ -51,10 +54,12 @@ sequenceDiagram
    - `architecture/APIQuotaPlan.md` のアラート設定に従い、Instagramのレート超過やOpenAIエラーを通知。
 
 ## 4. 留意点
+
 - Metaのレート制限: 1秒1リクエスト以下、連続100リクエスト毎にウェイト。
 - トークン管理: Azure Key Vaultに保管し、期限30日前にアラート。
 - GDPR/プライバシー: 公開情報のみを扱い、引用時に出典表示。
 
 ## 5. 次のアクション
+
 1. このシーケンスを `docs/product/Roadmap.md` の「データフロー/ETLシーケンス詳細化」タスクにリンク。
 2. 具体的なFunctions実装（スケジューラ、プロンプトテンプレート、Cosmosスキーマ）を失敗時リトライ含め設計。

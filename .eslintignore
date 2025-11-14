@@ -1,0 +1,9 @@
+node_modules
+.turbo
+dist
+build
+out
+coverage
+**/*.d.ts
+src/apps/backend/dist
+src/apps/frontend/.next

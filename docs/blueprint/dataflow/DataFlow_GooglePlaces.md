@@ -1,10 +1,12 @@
 # データフロー: Google Places 詳細 / 口コミ取得
 
 ## 1. 背景
+
 - Google Places API (Details / Autocomplete) を利用して最新の店舗情報と口コミを取得し、Cosmos DB とブラウザ/Edgeキャッシュに反映する。
 - 参考資料: `architecture/ArchitectureCurrent.md`, `architecture/APIQuotaPlan.md`, `architecture/CacheStrategy.md`, `operations/gcp/GoogleCloudSetup.md`.
 
 ## 2. シーケンス概要
+
 ```mermaid
 sequenceDiagram
     participant Frontend as Frontend (Next.js)
@@ -27,6 +29,7 @@ sequenceDiagram
 ```
 
 ## 3. 詳細ステップ
+
 1. **トリガー**
    - フロントの店舗詳細画面、またはバックエンドのバッチ更新から Functions API が呼ばれる。
 
@@ -48,6 +51,7 @@ sequenceDiagram
    - 連続失敗時は `architecture/APIQuotaPlan.md` に沿ってアラート→キャッシュ延長→利用者へ通知。
 
 ## 4. Autocomplete フロー
+
 ```mermaid
 sequenceDiagram
     participant Frontend
@@ -61,11 +65,13 @@ sequenceDiagram
 ```
 
 ## 5. アラート / クォータ管理
+
 - Google Cloud BillingのBudgetsで 50% / 80% / 100% 通知を送信。
 - Application InsightsのカスタムメトリクスでAPIコール数・エラー率をトラッキング。
 - 80%超過時はキャッシュTTL延長、Autocomplete入力回数制限など緊急対策を適用。
 
 ## 6. 次のアクション
+
 1. sessionToken のGUID生成・再利用ロジックをフロントに実装。
 2. レスポンスDTOとCosmosスキーマを定義（Places由来フィールドのマッピング表含む）。
 3. アラート設定（Google Budgets / App Insights）を `architecture/APIQuotaPlan.md` に合わせて自動化。

@@ -18,7 +18,7 @@ param repositoryUrl string
 param branch string = 'main'
 
 @description('Path to the frontend app relative to repo root (Next.js).')
-param appLocation string = 'src/frontend'
+param appLocation string = 'src/apps/frontend'
 
 @description('Path to the Azure Functions backend relative to repo root. Leave empty until backend is ready.')
 param apiLocation string = ''

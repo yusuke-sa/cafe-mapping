@@ -20,7 +20,7 @@ param repositoryUrl string
 param branch string = 'main'
 
 @description('Frontend app path relative to repo root.')
-param appLocation string = 'src/frontend'
+param appLocation string = 'src/apps/frontend'
 
 @description('Backend Functions path relative to repo root.')
 param apiLocation string = ''
@@ -34,7 +34,7 @@ param repositoryToken string = ''
 
 @description('Default resource tags applied to the Static Web App.')
 param tags object = {
-  project: 'cafe-mapping'
+  project: 'iijan-map'
   environment: 'dev'
 }
 

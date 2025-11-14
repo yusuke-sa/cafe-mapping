@@ -1,10 +1,10 @@
 {
-  "name": "@cafemap/frontend",
+  "name": "@iijan-map/frontend",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "dev": "echo 'TODO: start Next.js dev server'",
     "build": "echo 'TODO: build Next.js app'",
-    "lint": "echo 'TODO: lint frontend'"
+    "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --max-warnings=0 --no-error-on-unmatched-pattern"
   }
 }
