@@ -62,8 +62,8 @@
 | 2025-11-13 | P1 | データフロー/ETLシーケンスの詳細化（`docs/blueprint/dataflow/` 配下） | 完了 |
 | 2025-11-14 | P1 | APIエンドポイント一覧とI/F仕様下書き（`docs/blueprint/interface/openapi.yaml`） | 完了 |
 | 2025-11-15 | P1 | Azureリソース構成(Functions/Cosmos等)のSKU決定 | 完了 |
-| 2025-11-16 | P1 | Infrastructure as Code方針検討(Bicep/ARM) | 未着手 |
-| 2025-11-17 | P1 | Azure Static Web Apps環境の初期セットアップ | 未着手 |
+| 2025-11-16 | P1 | Infrastructure as Code方針検討(Bicep/ARM) | 完了 |
+| 2025-11-17 | P1 | Azure Static Web Apps環境の初期セットアップ | 完了（手順ドキュメント化） |
 | 2025-11-18 | P1 | Azure Functionsプロジェクト雛形作成 | 未着手 |
 | 2025-11-19 | P1 | Cosmos DBのコンテナ設計(パーティション/インデックス) | 未着手 |
 | 2025-11-20 | P1 | Cognitive Searchインデックス設計草案 | 未着手 |

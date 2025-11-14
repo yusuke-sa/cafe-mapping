@@ -1,0 +1,10 @@
+{
+  "name": "@cafemap/backend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'TODO: start Azure Functions host'",
+    "build": "echo 'TODO: build backend functions'",
+    "lint": "echo 'TODO: lint backend'"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@cafemap/frontend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'TODO: start Next.js dev server'",
+    "build": "echo 'TODO: build Next.js app'",
+    "lint": "echo 'TODO: lint frontend'"
+  }
+}

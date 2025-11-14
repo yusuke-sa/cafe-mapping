@@ -1,0 +1,9 @@
+{
+  "name": "@cafemap/infra",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "echo 'TODO: run bicep build for validation'",
+    "deploy:infra": "echo 'TODO: az deployment group create --template-file src/infra/main.bicep'"
+  }
+}
