@@ -8,7 +8,9 @@ Monorepo の IaC レイヤー。`main.bicep` とモジュール群で Azure Stat
 src/infra/
 ├── main.bicep                # リソースグループ単位のエントリーポイント
 ├── modules/
-│   └── static-web-app.bicep  # Static Web Apps 単体モジュール
+│   ├── static-web-app.bicep  # Static Web Apps
+│   ├── cosmos-db.bicep       # Cosmos DB (Free tier/provisioned throughput by default, Serverless optional via `cosmosAccountMode`) + 5 containers
+│   └── search.bicep          # Azure Cognitive Search + stores-index
 └── environments/
     └── dev.bicepparam        # `iijan-map-dev` 環境のパラメータ例
 ```
