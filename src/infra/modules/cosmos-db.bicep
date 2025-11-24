@@ -10,30 +10,42 @@ param databaseName string
 @description('Resource tags')
 param tags object = {}
 
+@description('Deploy Cosmos DB as serverless (mutually exclusive with free tier).')
+param enableServerless bool = true
+
+@description('Enable the Cosmos DB free tier (cannot be combined with serverless).')
+param enableFreeTier bool = false
+
+var accountProperties = {
+  databaseAccountOfferType: 'Standard'
+  locations: [
+    {
+      locationName: location
+      failoverPriority: 0
+    }
+  ]
+  capabilities: enableServerless ? [
+    {
+      name: 'EnableServerless'
+    }
+  ] : []
+  publicNetworkAccess: 'Enabled'
+  disableKeyBasedMetadataWriteAccess: true
+  consistencyPolicy: {
+    defaultConsistencyLevel: 'Session'
+  }
+}
+
+var freeTierProperties = !enableServerless && enableFreeTier ? {
+  enableFreeTier: true
+} : {}
+
 resource account 'Microsoft.DocumentDB/databaseAccounts@2024-05-15' = {
   name: accountName
   location: location
   kind: 'GlobalDocumentDB'
   tags: tags
-  properties: {
-    databaseAccountOfferType: 'Standard'
-    locations: [
-      {
-        locationName: location
-        failoverPriority: 0
-      }
-    ]
-    capabilities: [
-      {
-        name: 'EnableServerless'
-      }
-    ]
-    publicNetworkAccess: 'Enabled'
-    disableKeyBasedMetadataWriteAccess: true
-    consistencyPolicy: {
-      defaultConsistencyLevel: 'Session'
-    }
-  }
+  properties: union(accountProperties, freeTierProperties)
 }
 
 resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2024-05-15' = {
