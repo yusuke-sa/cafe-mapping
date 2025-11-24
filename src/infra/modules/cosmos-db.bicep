@@ -11,10 +11,10 @@ param databaseName string
 param tags object = {}
 
 @description('Deploy Cosmos DB as serverless (mutually exclusive with free tier).')
-param enableServerless bool = true
+param enableServerless bool = false
 
 @description('Enable the Cosmos DB free tier (cannot be combined with serverless).')
-param enableFreeTier bool = false
+param enableFreeTier bool = true
 
 var accountProperties = {
   databaseAccountOfferType: 'Standard'

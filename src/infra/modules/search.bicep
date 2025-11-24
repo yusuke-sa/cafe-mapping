@@ -9,7 +9,7 @@ param searchServiceName string
   'free'
   'basic'
 ])
-param sku string = 'basic'
+param sku string = 'free'
 
 @description('Index name')
 param indexName string = 'stores-index'
