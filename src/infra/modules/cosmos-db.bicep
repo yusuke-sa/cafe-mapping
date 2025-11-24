@@ -10,11 +10,13 @@ param databaseName string
 @description('Resource tags')
 param tags object = {}
 
-@description('Deploy Cosmos DB as serverless (mutually exclusive with free tier).')
-param enableServerless bool = false
-
-@description('Enable the Cosmos DB free tier (cannot be combined with serverless).')
-param enableFreeTier bool = true
+@description('Deployment mode for the Cosmos account (free, serverless, or standard provisioned).')
+@allowed([
+  'free'
+  'serverless'
+  'standard'
+])
+param accountMode string = 'free'
 
 var accountProperties = {
   databaseAccountOfferType: 'Standard'
@@ -24,7 +26,7 @@ var accountProperties = {
       failoverPriority: 0
     }
   ]
-  capabilities: enableServerless ? [
+  capabilities: accountMode == 'serverless' ? [
     {
       name: 'EnableServerless'
     }
@@ -36,7 +38,7 @@ var accountProperties = {
   }
 }
 
-var freeTierProperties = !enableServerless && enableFreeTier ? {
+var freeTierProperties = accountMode == 'free' ? {
   enableFreeTier: true
 } : {}
 

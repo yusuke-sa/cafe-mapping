@@ -9,7 +9,7 @@ src/infra/
 ├── main.bicep                # リソースグループ単位のエントリーポイント
 ├── modules/
 │   ├── static-web-app.bicep  # Static Web Apps
-│   ├── cosmos-db.bicep       # Cosmos DB (Serverless) + 5 containers
+│   ├── cosmos-db.bicep       # Cosmos DB (Free tier by default, Serverless optional) + 5 containers
 │   └── search.bicep          # Azure Cognitive Search + stores-index
 └── environments/
     └── dev.bicepparam        # `iijan-map-dev` 環境のパラメータ例
