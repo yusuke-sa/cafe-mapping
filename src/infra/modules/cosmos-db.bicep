@@ -10,9 +10,6 @@ param databaseName string
 @description('Resource tags')
 param tags object = {}
 
-@description('Enable free tier (only one account per subscription).')
-param enableFreeTier bool = true
-
 resource account 'Microsoft.DocumentDB/databaseAccounts@2024-05-15' = {
   name: accountName
   location: location
@@ -32,7 +29,6 @@ resource account 'Microsoft.DocumentDB/databaseAccounts@2024-05-15' = {
       }
     ]
     publicNetworkAccess: 'Enabled'
-    enableFreeTier: enableFreeTier
     disableKeyBasedMetadataWriteAccess: true
     consistencyPolicy: {
       defaultConsistencyLevel: 'Session'
