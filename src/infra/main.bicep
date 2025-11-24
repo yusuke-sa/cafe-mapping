@@ -3,8 +3,19 @@ targetScope = 'resourceGroup'
 @description('Azure region for Static Web App metadata (SWA itself is globally distributed).')
 param location string = 'East Asia'
 
-@description('Cosmos DB account name (serverless).')
+@description('Cosmos DB account name.')
 param cosmosAccountName string
+
+@description('Cosmos DB account deployment mode (free/serverless/standard).')
+@allowed([
+  'free'
+  'serverless'
+  'standard'
+])
+param cosmosAccountMode string = 'free'
+
+@description('Shared database throughput (RU/s) for provisioned Cosmos DB modes.')
+param cosmosDatabaseThroughput int = 400
 
 @description('Cosmos DB SQL database name.')
 param cosmosDatabaseName string = 'iijan-map'
@@ -79,6 +90,8 @@ module cosmos './modules/cosmos-db.bicep' = {
     location: location
     accountName: cosmosAccountName
     databaseName: cosmosDatabaseName
+    accountMode: cosmosAccountMode
+    databaseThroughput: cosmosDatabaseThroughput
     tags: tags
   }
 }

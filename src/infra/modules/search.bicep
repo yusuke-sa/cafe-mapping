@@ -260,7 +260,7 @@ resource storesIndex 'Microsoft.Search/searchServices/indexes@2023-11-01' = {
         ]
       }
     ]
-    semanticSearch: sku == 'free' || sku == 'basic' ? null : {
+    semanticSearch: if (sku != 'free' && sku != 'basic') {
       configurations: [
         {
           name: 'semantic-default'

@@ -18,6 +18,9 @@ param tags object = {}
 ])
 param accountMode string = 'free'
 
+@description('Shared database throughput (RU/s). Applied only when using provisioned throughput tiers (free/standard).')
+param databaseThroughput int = 400
+
 var accountProperties = {
   databaseAccountOfferType: 'Standard'
   locations: [
@@ -55,6 +58,9 @@ resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2024-05-15
   properties: {
     resource: {
       id: databaseName
+    }
+    options: accountMode == 'serverless' ? {} : {
+      throughput: databaseThroughput
     }
   }
 }
