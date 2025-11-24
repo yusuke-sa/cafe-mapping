@@ -73,8 +73,8 @@
 | 2025-11-17 | P1       | Azure Static Web Apps環境の初期セットアップ                                                 | 完了（手順ドキュメント化）                                      |
 | 2025-11-18 | P1       | Azure Functionsプロジェクト雛形作成                                                         | 完了（`src/apps/backend` TypeScript Functions v4 テンプレート） |
 | 2025-11-19 | P1       | Cosmos DBのコンテナ設計(パーティション/インデックス)                                        | 完了（`docs/blueprint/database/CosmosDB.md`）                   |
-| 2025-11-20 | P1       | Cognitive Searchインデックス設計草案                                                        | 未着手                                                          |
-| 2025-11-21 | P1       | Secrets管理手法(Azure Key Vault等)の決定                                                    | 未着手                                                          |
+| 2025-11-20 | P1       | Cognitive Searchインデックス設計草案                                                        | 完了（`docs/blueprint/CognitiveSearchIndex.md`）                |
+| 2025-11-21 | P1       | Secrets管理手法(Azure Key Vault等)の決定                                                    | 完了（`docs/blueprint/Security_KeyVault.md`）                   |
 | 2025-11-22 | P1       | ローカル開発環境/Dev Container設定                                                          | 未着手                                                          |
 | 2025-11-23 | P1       | CI/CDパイプライン設計書起草                                                                 | 未着手                                                          |
 | 2025-11-24 | P1       | アーキテクチャ仕様書まとめ                                                                  | 未着手                                                          |
