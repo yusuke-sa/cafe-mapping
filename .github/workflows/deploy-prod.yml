@@ -1,0 +1,98 @@
+name: Deploy (prod)
+
+# NOTE:
+# - Assumes GitHub Environment "prod" has protection (required reviewers/approvals).
+# - Build/Lint must succeed; deploy job depends on build job and will not run if tests fail.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+env:
+  AZURE_RG: ${{ secrets.AZURE_RG_PROD }}
+  STATIC_WEB_APP_NAME: ${{ secrets.SWA_NAME_PROD }}
+  FUNCTION_APP_NAME: ${{ secrets.FUNC_APP_NAME_PROD }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      backend_path: src/apps/backend
+      frontend_path: src/apps/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
+      - name: Archive backend
+        run: |
+          cd src/apps/backend
+          zip -r ../../backend.zip .
+      - name: Archive frontend
+        run: |
+          cd src/apps/frontend
+          zip -r ../../frontend.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prod-artifacts
+          path: |
+            backend.zip
+            frontend.zip
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: prod
+      url: ${{ steps.swa_out.outputs.static_web_app_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: prod-artifacts
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID_PROD }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy infrastructure (Bicep)
+        run: |
+          az deployment group create \
+            --resource-group "$AZURE_RG" \
+            --template-file src/infra/main.bicep \
+            --parameters @src/infra/environments/prod.bicepparam
+
+      - name: Deploy Functions
+        uses: azure/functions-action@v1
+        with:
+          app-name: ${{ env.FUNCTION_APP_NAME }}
+          package: backend.zip
+          publish-profile: ${{ secrets.AZURE_FUNCAPP_PUBLISH_PROFILE_PROD }}
+
+      - name: Deploy Static Web Apps
+        id: swa_out
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_PROD }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          skip_app_build: true
+          skip_api_build: true
+          app_location: "."
+          app_artifact_location: "frontend.zip"
