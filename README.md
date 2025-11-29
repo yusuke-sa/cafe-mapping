@@ -15,6 +15,7 @@
 - `src/apps/backend/` … Azure Functions (Node.js) のAPIコード配置予定地。
 - `src/packages/` … フロント/バックエンドで共有するユーティリティやUIコンポーネント。
 - `src/infra/` … Azure Bicep テンプレート。`src/infra/main.bicep` から Static Web Apps などをデプロイ。
+- `.devcontainer/` … VS Code Dev Container 設定。Azurite/Cosmos Emulator を含むローカル環境は `docs/operations/devcontainer.md` を参照。
 
 各ドキュメント/コードは必要に応じて更新し、関係者間での情報共有に活用してください。
 

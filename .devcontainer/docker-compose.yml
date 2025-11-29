@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspaces/cafe-mapping:cached
+      - functions-node-modules:/workspaces/cafe-mapping/src/apps/backend/node_modules
+      - frontend-node-modules:/workspaces/cafe-mapping/src/apps/frontend/node_modules
+    command: sleep infinity
+    environment:
+      AzureWebJobsStorage: UseDevelopmentStorage=true
+      FUNCTIONS_WORKER_RUNTIME: node
+      AZURE_FUNCTIONS_ENVIRONMENT: Development
+      COSMOS_EMULATOR_CONNECTION_STRING: AccountEndpoint=https://cosmos:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDjEwep0==;ApiKind=SQL;
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
+      SEARCH_ENDPOINT: ""
+      SEARCH_API_KEY: ""
+    depends_on:
+      - azurite
+      - cosmos
+    ports:
+      - "3000:3000"
+      - "7071:7071"
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - azurite-data:/data
+
+  cosmos:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+    restart: unless-stopped
+    environment:
+      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: 1
+      AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "false"
+      AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE: cosmos
+    ports:
+      - "8081:8081"
+      - "10250:10250"
+      - "10251:10251"
+      - "10252:10252"
+      - "10253:10253"
+      - "10254:10254"
+      - "10255:10255"
+    volumes:
+      - cosmos-data:/tmp/cosmos
+
+volumes:
+  functions-node-modules:
+  frontend-node-modules:
+  azurite-data:
+  cosmos-data:

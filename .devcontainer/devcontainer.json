@@ -1,0 +1,38 @@
+{
+  "name": "iijan-map-dev",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/cafe-mapping",
+  "features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-azurefunctions",
+        "ms-azuretools.vscode-azurite",
+        "ms-vscode-azurecli",
+        "ms-azuretools.vscode-bicep",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "azureFunctions.showCoreToolsWarning": false,
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "postCreateCommand": "npm install",
+  "postStartCommand": "bash .devcontainer/scripts/setup-certs.sh",
+  "forwardPorts": [3000, 7071, 10000, 10001, 10002, 8081],
+  "remoteEnv": {
+    "AZURE_FUNCTIONS_ENVIRONMENT": "Development"
+  },
+  "runServices": [
+    "azurite",
+    "cosmos"
+  ],
+  "shutdownAction": "stopCompose"
+}
