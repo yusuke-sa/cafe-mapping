@@ -1,0 +1,24 @@
+{
+  "name": "@iijan-map/instagram-graph-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Axios-based Instagram Graph API helper utilities.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint \"src/**/*.ts\" --max-warnings=0",
+    "typecheck": "tsc --noEmit --pretty"
+  },
+  "dependencies": {
+    "axios": "^1.7.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.3",
+    "typescript": "^5.6.3"
+  }
+}
