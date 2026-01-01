@@ -7,6 +7,7 @@
 ```
 src/packages/shared-utils
 src/packages/ui-components
+src/packages/instagram-graph-client
 ```
 
 必要に応じて `npm init -w src/packages/<name>` でパッケージを追加する。
